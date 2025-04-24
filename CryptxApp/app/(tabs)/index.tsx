@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions } from 'react-native';
+import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native';
 
 const windowWidth = Dimensions.get('window').width;
@@ -8,17 +8,109 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
+          <View style={styles.space}>
+            <Image
+              source={require('@/assets/images/profil.svg')}
+              style={styles.profil}
+              resizeMode="contain"
+            />
+            <Image
+              source={require('@/assets/images/settings-3-line.svg')}
+              style={styles.settings}
+              resizeMode="contain"
+            />
+          </View>
+          
           <Image
             source={require('@/assets/images/Group.svg')}
             style={styles.reactLogo}
             resizeMode="contain"
           />
+          
+          <View style={styles.mainContent}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>
+                Hello Alex
+              </Text>
+            </View>
+            
+            <View style={styles.balanceCard}>
+              <Text style={styles.balanceLabel}>Current Balance</Text>
+              <View style={styles.balanceRow}>
+                <Text style={styles.balanceAmount}>$87,430.12</Text>
+                <Text style={styles.balancePercent}>↑ 10.2%</Text>
+              </View>
+            </View>
+            
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.depositButton}>
+                <Text style={styles.buttonText}>Deposit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.withdrawButton}>
+                <Text style={styles.buttonText}>Withdraw</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-        <View style={styles.content}>
-          <Text style={styles.title}>Bienvenue sur Cryptx</Text>
-          <Text style={styles.text}>
-            Votre nouvelle application est prête à être personnalisée.
+        
+        <View style={styles.holding}>
+          <Text style={styles.holdingTitle}>
+            Holdings
           </Text>
+          <Text style={styles.seeAllText}>
+            See All
+          </Text>
+        </View>
+        <View style={styles.cryptoList}>
+          <View style={styles.cryptoCard}>
+            <View style={styles.cryptoIconContainer}>
+              <Image
+                source={require('@/assets/images/ETH_Icon.svg')}
+                style={styles.cryptoIcon}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.cryptoInfo}>
+              <Text style={styles.cryptoName}>Ethereum</Text>
+              <Text style={styles.cryptoSymbol}>ETH</Text>
+            </View>
+            <View style={styles.cryptoGraph}>
+              <Image
+                source={require('@/assets/images/Graph_ETH.svg')} 
+                style={[styles.graphLine, { tintColor: '#4CD964' }]}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.cryptoValue}>
+              <Text style={styles.cryptoPrice}>$503.12</Text>
+              <Text style={styles.cryptoQuantity}>50 ETH</Text>
+            </View>
+          </View>
+          
+          <View style={styles.cryptoCard}>
+            <View style={styles.cryptoIconContainer}>
+            <Image
+                source={require('@/assets/images/bitcoin-logo.svg')} 
+                style={[styles.btcIcon]}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.cryptoInfo}>
+              <Text style={styles.cryptoName}>Bitcoin</Text>
+              <Text style={styles.cryptoSymbol}>BTC</Text>
+            </View>
+            <View style={styles.cryptoGraph}>
+              <Image
+                source={require('@/assets/images/Graph_BTC.svg')}
+                style={[styles.graphLine, { tintColor: '#FF3B30' }]}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.cryptoValue}>
+              <Text style={styles.cryptoPrice}>$26927</Text>
+              <Text style={styles.cryptoQuantity}>2.05 BTC</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -34,12 +126,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
   },
   header: {
-    height: 250,
+    height: 360,
     backgroundColor: '#000000',
     position: 'relative',
     width: '100%',
-    justifyContent: 'center',
+    marginBottom: 0,
+  },
+  mainContent: {
+    width: '100%',
     alignItems: 'center',
+    paddingTop: 100,
+    zIndex: 2,
   },
   content: {
     padding: 32,
@@ -51,13 +148,180 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 16,
   },
+  holdingTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
   text: {
     fontSize: 16,
     color: '#FFFFFF',
+  },
+  seeAllText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    opacity: 0.8,
   },
   reactLogo: {
     width: windowWidth,
     height: '100%',
     position: 'absolute',
+    top: 0,
+    zIndex: 0,
+  },
+  profil: {
+    width: 48,
+    height: 48,
+  },
+  settings: {
+    width: 24,
+    height: 24,
+  },
+  space: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 20,
+    position: 'absolute',
+    top: 30,
+    zIndex: 3,
+  },
+  titleContainer: {
+    alignSelf: 'flex-start',
+    paddingLeft: 20,
+    marginBottom: 20,
+  },
+  balanceCard: {
+    width: '85%',
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: '#333333',
+    marginBottom: 20,
+    zIndex: 2,
+  },
+  balanceLabel: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  balanceAmount: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  balancePercent: {
+    marginRight: 35,
+    fontSize: 16,
+    color: '#8833ff',
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '85%',
+    marginBottom: 10,
+    zIndex: 2,
+  },
+  depositButton: {
+    backgroundColor: '#5D5FEF',
+    borderRadius: 16,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    width: '48%',
+    alignItems: 'center',
+  },
+  withdrawButton: {
+    backgroundColor: 'transparent',
+    borderRadius: 16,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    width: '48%',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  holding: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
+  cryptoList: {
+    paddingHorizontal: 20,
+  },
+  cryptoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1C1C1E',
+    borderRadius: 16,
+    padding: 15,
+    marginBottom: 15,
+  },
+  cryptoIconContainer: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#333333',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  cryptoIcon: {
+    width: 24,
+    height: 24,
+  },
+  btcIcon: {
+    color: '#F7931A',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  cryptoInfo: {
+    flex: 1,
+  },
+  cryptoName: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cryptoSymbol: {
+    color: '#8E8E93',
+    fontSize: 14,
+  },
+  cryptoGraph: {
+    width: 80,
+    height: 30,
+    marginHorizontal: 10,
+  },
+  graphLine: {
+    width: '100%',
+    height: '100%',
+  },
+  cryptoValue: {
+    alignItems: 'flex-end',
+  },
+  cryptoPrice: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cryptoQuantity: {
+    color: '#8E8E93',
+    fontSize: 12,
+  },
+  btcIcon: {
+    width: 12,
+    height: 12,
   },
 });
