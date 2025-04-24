@@ -29,21 +29,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '',
+          tabBarLabelStyle: { display: 'none' },
           tabBarIcon: ({ color }) => <Home color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: '',
+          tabBarLabelStyle: { display: 'none' },
           tabBarIcon: ({ color }) => <Details color={color} />,
         }}
       />
       <Tabs.Screen
         name="account"
         options={{
-          title: '',
+          tabBarLabelStyle: { display: 'none' },
           tabBarIcon: ({ color }) => <Account color={color} />,
         }}
       />
