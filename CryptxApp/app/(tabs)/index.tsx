@@ -1,11 +1,12 @@
 import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native';
 import BitcoinLogo from '@/assets/images/bitcoin_logo';
-import EthLogo from '@/assets/eth_icon';
+import EthLogo from '@/assets/images/eth_icon';
 import Settings from '@/assets/images/Settings';
 import GraphEth from '@/assets/images/Graph_eth';
 import GraphBtc from '@/assets/images/Graph_btc';
 import Group from '@/assets/images/Group';
+import ButtonStyle from '@/components/ButtonStyle';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -43,12 +44,12 @@ export default function HomeScreen() {
             </View>
             
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.depositButton}>
-                <Text style={styles.buttonText}>Deposit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.withdrawButton}>
-                <Text style={styles.buttonText}>Withdraw</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonWrapper}>
+                <ButtonStyle type="Fill" label="Deposit" onPress={() => {}} />
+              </View>
+              <View style={styles.buttonWrapper}>
+                <ButtonStyle type="Transparent" label="Withdraw" onPress={() => {}} />
+              </View>
             </View>
           </View>
         </View>
@@ -226,28 +227,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     zIndex: 2,
   },
-  depositButton: {
-    backgroundColor: '#5D5FEF',
-    borderRadius: 16,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+  buttonWrapper: {
     width: '48%',
-    alignItems: 'center',
-  },
-  withdrawButton: {
-    backgroundColor: 'transparent',
-    borderRadius: 16,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    width: '48%',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: 'bold',
   },
   holding: {
     flexDirection: 'row',
