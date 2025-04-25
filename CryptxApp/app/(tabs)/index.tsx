@@ -1,5 +1,11 @@
 import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native';
+import BitcoinLogo from '@/assets/images/bitcoin_logo';
+import EthLogo from '@/assets/eth_icon';
+import Settings from '@/assets/images/Settings';
+import GraphEth from '@/assets/images/Graph_eth';
+import GraphBtc from '@/assets/images/Graph_btc';
+import Group from '@/assets/images/Group';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -10,21 +16,15 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.space}>
             <Image
-              source={require('@/assets/images/profil.svg')}
+              source={require('@/assets/images/profil.png')}
               style={styles.profil}
               resizeMode="contain"
             />
-            <Image
-              source={require('@/assets/images/settings-3-line.svg')}
-              style={styles.settings}
-              resizeMode="contain"
-            />
+            <Settings />
           </View>
           
-          <Image
-            source={require('@/assets/images/Group.svg')}
+          <Group
             style={styles.reactLogo}
-            resizeMode="contain"
           />
           
           <View style={styles.mainContent}>
@@ -64,10 +64,10 @@ export default function HomeScreen() {
         <View style={styles.cryptoList}>
           <View style={styles.cryptoCard}>
             <View style={styles.cryptoIconContainer}>
-              <Image
-                source={require('@/assets/images/ETH_Icon.svg')}
+              <EthLogo
+                width={24}
+                height={24}
                 style={styles.cryptoIcon}
-                resizeMode="contain"
               />
             </View>
             <View style={styles.cryptoInfo}>
@@ -75,10 +75,9 @@ export default function HomeScreen() {
               <Text style={styles.cryptoSymbol}>ETH</Text>
             </View>
             <View style={styles.cryptoGraph}>
-              <Image
-                source={require('@/assets/images/Graph_ETH.svg')} 
-                style={[styles.graphLine, { tintColor: '#4CD964' }]}
-                resizeMode="contain"
+              <GraphEth 
+                style={styles.graphLine}
+                stroke="#4CD964"
               />
             </View>
             <View style={styles.cryptoValue}>
@@ -89,10 +88,10 @@ export default function HomeScreen() {
           
           <View style={styles.cryptoCard}>
             <View style={styles.cryptoIconContainer}>
-            <Image
-                source={require('@/assets/images/bitcoin-logo.svg')} 
-                style={[styles.btcIcon]}
-                resizeMode="contain"
+              <BitcoinLogo
+                width={22}
+                height={22}
+                style={styles.cryptoIcon}
               />
             </View>
             <View style={styles.cryptoInfo}>
@@ -100,10 +99,9 @@ export default function HomeScreen() {
               <Text style={styles.cryptoSymbol}>BTC</Text>
             </View>
             <View style={styles.cryptoGraph}>
-              <Image
-                source={require('@/assets/images/Graph_BTC.svg')}
-                style={[styles.graphLine, { tintColor: '#FF3B30' }]}
-                resizeMode="contain"
+              <GraphBtc
+                style={styles.graphLine}
+                stroke="#FF3B30"
               />
             </View>
             <View style={styles.cryptoValue}>
@@ -282,11 +280,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
-  btcIcon: {
-    color: '#F7931A',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   cryptoInfo: {
     flex: 1,
   },
@@ -319,9 +312,5 @@ const styles = StyleSheet.create({
   cryptoQuantity: {
     color: '#8E8E93',
     fontSize: 12,
-  },
-  btcIcon: {
-    width: 12,
-    height: 12,
   },
 });
