@@ -1,14 +1,41 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image } from 'react-native';
 import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
-import { View, Text } from 'react-native';
 import ChartComponent from '@/components/ChartComponent';
-import BitcoinLogo from '@/assets/images/BitcoinLogo';
+import { getCryptoInfo, subscribeToPriceUpdates } from '../../query/cryptoService';
 
 export default function Explore() {
+  const [currentPrice, setCurrentPrice] = useState<string>('0');
+  const [cryptoInfo, setCryptoInfo] = useState<any>({});
+  const [selectedCoin, setSelectedCoin] = useState<string>('BTCUSDT');
+
+  useEffect(() => {
+    const fetchCryptoInfo = async () => {
+      try {
+        const info = await getCryptoInfo(selectedCoin);
+        setCryptoInfo(info);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des infos de crypto', error);
+      }
+    };
+
+    fetchCryptoInfo();
+  }, [selectedCoin]);
+
+  useEffect(() => {
+    const ws = subscribeToPriceUpdates(selectedCoin.toLocaleLowerCase(), (price) => {
+      setCurrentPrice(price);
+    });
+
+    return () => {
+      ws.close();
+    };
+  }, [selectedCoin]);
+
   return (
-      <View style={{flex: 1, backgroundColor: '#070707', alignItems: 'center', paddingBottom: 80, paddingTop: 50}}>
-      
+    <View style={{ flex: 1, backgroundColor: '#070707', alignItems: 'center', paddingBottom: 80, paddingTop: 50 }}>
       <View style={{
         flexDirection: 'row',
         alignItems: 'center',
@@ -27,7 +54,10 @@ export default function Explore() {
         <Settings />
       </View>
 
-      <CryptoTabs coins={['BTC', 'ETH', 'LTC', 'XRP', 'EOS', 'SOL', 'ADA', 'DOT', 'BNB']} />
+      <CryptoTabs 
+        coins={['BTC', 'ETH', 'LTC', 'XRP', 'EOS', 'SOL', 'ADA', 'DOT', 'BNB']} 
+        onSelectCoin={setSelectedCoin}
+      />
 
       <View style={{
         flexDirection: 'row',
@@ -37,14 +67,14 @@ export default function Explore() {
         <View style={{
           height: 60,
           width: 60,
-          borderRadius: 5,
+          borderRadius: 6,
           backgroundColor: '#212125',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <BitcoinLogo />
+          {cryptoInfo.logo && <Image source={{ uri: cryptoInfo.logo }} style={{ width: 40, height: 40 }} />}
         </View>
-        
+
         <View style={{ flex: 1, paddingLeft: 10 }}>
           <View style={{
             flexDirection: 'row',
@@ -56,14 +86,14 @@ export default function Explore() {
               fontSize: 20,
               fontFamily: 'Poppins-SemiBold',
             }}>
-              Bitcoin
+              {cryptoInfo.name || 'Loading...'}
             </Text>
             <Text style={{
               color: '#FFF',
               fontSize: 20,
               fontFamily: 'Poppins-SemiBold',
             }}>
-              $26927
+              ${parseFloat(currentPrice).toFixed(2)}
             </Text>
           </View>
           <View style={{
@@ -76,7 +106,7 @@ export default function Explore() {
               fontSize: 14,
               fontFamily: 'Poppins-SemiBold',
             }}>
-              BTC
+              {cryptoInfo.symbol || 'Loading...'}
             </Text>
             <Text style={{
               color: '#6C757D',
@@ -148,73 +178,72 @@ export default function Explore() {
       </View>
 
       <View style={{
-          alignItems: 'flex-start',
-          paddingHorizontal: 20,
-          marginBottom: 15,
-          paddingVertical: 10,
-          width: '100%',
-        }}>
-          <View style={{flexDirection: 'row',}}>
-
-            <View style={{alignItems: 'flex-start'}}>
-              <Text style={{
-                color: '#B9C1D9',
-                fontSize: 14,
-                fontFamily: 'Poppins-Regular',
-                textAlign: 'center',
-              }}>
-                Amount
-              </Text>
-              <Text style={{
-                color: '#FFF',
-                fontSize: 20,
-                fontFamily: 'Poppins-Regular',
-                textAlign: 'center',
-              }}>
-                345 USD
-              </Text>
-            </View>
-
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 10,
-              width: '100%',
+        alignItems: 'flex-start',
+        paddingHorizontal: 20,
+        marginBottom: 15,
+        paddingVertical: 10,
+        width: '100%',
+      }}>
+        <View style={{ flexDirection: 'row', }}>
+          <View style={{ alignItems: 'flex-start' }}>
+            <Text style={{
+              color: '#B9C1D9',
+              fontSize: 14,
+              fontFamily: 'Poppins-Regular',
+              textAlign: 'center',
             }}>
-              <Text style={{
-                color: '#FFF',
-                fontSize: 14,
-                fontFamily: 'Poppins-Regular',
-                marginRight: 10, 
-              }}>
-                25%
-              </Text>
-              <Text style={{
-                color: '#FFF',
-                fontSize: 14,
-                fontFamily: 'Poppins-Regular',
-                marginRight: 10, 
-              }}>
-                50%
-              </Text>
-              <Text style={{
-                color: '#FFF',
-                fontSize: 14,
-                fontFamily: 'Poppins-Regular',
-              }}>
-                100%
-              </Text>
-            </View>
+              Amount
+            </Text>
+            <Text style={{
+              color: '#FFF',
+              fontSize: 20,
+              fontFamily: 'Poppins-Regular',
+              textAlign: 'center',
+            }}>
+              345 USD
+            </Text>
           </View>
-          
+
           <View style={{
-            height: 1,
-            backgroundColor: '#6C757D',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
             marginTop: 10,
             width: '100%',
-          }} />
+          }}>
+            <Text style={{
+              color: '#FFF',
+              fontSize: 14,
+              fontFamily: 'Poppins-Regular',
+              marginRight: 10,
+            }}>
+              25%
+            </Text>
+            <Text style={{
+              color: '#FFF',
+              fontSize: 14,
+              fontFamily: 'Poppins-Regular',
+              marginRight: 10,
+            }}>
+              50%
+            </Text>
+            <Text style={{
+              color: '#FFF',
+              fontSize: 14,
+              fontFamily: 'Poppins-Regular',
+            }}>
+              100%
+            </Text>
+          </View>
         </View>
+
+        <View style={{
+          height: 1,
+          backgroundColor: '#6C757D',
+          marginTop: 10,
+          width: '100%',
+        }} />
+      </View>
     </View>
   );
 }

@@ -16,7 +16,7 @@ const ChartComponent = () => {
     9, 8.7, 9.3, 9.5
   ];
 
-  const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon'];
+  const labels = ['', '', '', '', '', '', '', ''];
   const labelDates = ['15', '16', '17', '18', '19', '20', '21', '22'];
 
   return (

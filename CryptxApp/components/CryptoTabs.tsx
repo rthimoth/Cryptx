@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 
-const CryptoTabs = ({ coins = ['BTC', 'ETH', 'LTC', 'XRP', 'EOS'] }) => {
+interface CryptoTabsProps {
+  coins?: string[];
+  onSelectCoin: (coin: string) => void;
+}
+
+const CryptoTabs: React.FC<CryptoTabsProps> = ({ coins = ['BTC', 'ETH', 'LTC', 'XRP', 'EOS'], onSelectCoin }) => {
   const [selected, setSelected] = useState(coins[0]);
+
+  const handleTabSelect = (coin: React.SetStateAction<string>) => {
+    setSelected(coin);
+    onSelectCoin(coin + 'USDT');
+  };
 
   return (
     <View style={styles.wrapper}>
@@ -14,7 +24,7 @@ const CryptoTabs = ({ coins = ['BTC', 'ETH', 'LTC', 'XRP', 'EOS'] }) => {
         {coins.map((coin, index) => {
           const isActive = coin === selected;
           return (
-            <Pressable key={index} onPress={() => setSelected(coin)}>
+            <Pressable key={index} onPress={() => handleTabSelect(coin)}>
               <View style={styles.tab}>
                 <Text style={[styles.text, isActive && styles.activeText]}>
                   {coin}
