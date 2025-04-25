@@ -36,6 +36,11 @@ export default function HomeScreen() {
             </View>
             
             <View style={styles.balanceCard}>
+              <Image 
+                source={require('@/assets/images/Rectangle.png')}
+                style={styles.balanceBackground}
+                resizeMode="cover"
+              />
               <Text style={styles.balanceLabel}>Current Balance</Text>
               <View style={styles.balanceRow}>
                 <Text style={styles.balanceAmount}>$87,430.12</Text>
@@ -159,7 +164,8 @@ const styles = StyleSheet.create({
   seeAllText: {
     fontSize: 16,
     color: '#FFFFFF',
-    opacity: 0.8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FFFFFF',
   },
   reactLogo: {
     width: windowWidth,
@@ -195,19 +201,29 @@ const styles = StyleSheet.create({
     width: '85%',
     padding: 16,
     borderRadius: 20,
-    backgroundColor: '#333333',
+    position: 'relative',
     marginBottom: 20,
     zIndex: 2,
+    height: 100,
+    overflow: 'hidden',
+  },
+  balanceBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+    borderRadius: 20,
   },
   balanceLabel: {
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#070707',
     marginBottom: 8,
   },
   balanceAmount: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#070707',
   },
   balanceRow: {
     flexDirection: 'row',
