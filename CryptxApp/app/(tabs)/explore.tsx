@@ -2,10 +2,11 @@ import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
 import { View, Text } from 'react-native';
+import ChartComponent from '@/components/ChartComponent';
 
 export default function Explore() {
   return (
-    <View style={{flex: 1, backgroundColor: '#070707', alignItems: 'center'}}>
+      <View style={{flex: 1, backgroundColor: '#070707', alignItems: 'center', paddingBottom: 80, paddingTop: 50}}>
       
       <View style={{
         flexDirection: 'row',
@@ -13,7 +14,6 @@ export default function Explore() {
         width: '100%',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        marginTop: 80,
       }}>
         <Text style={{
           fontSize: 30,
@@ -83,6 +83,32 @@ export default function Explore() {
               2.05 BTC
             </Text>
           </View>
+        </View>
+      </View>
+
+      <ChartComponent />
+
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        gap: 10,
+      }}>
+        <View style={{ flex: 1 }}>
+          <ButtonStyle
+            type="Fill"
+            label="Buy"
+            onPress={() => console.log('Buy pressed')}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <ButtonStyle
+            type="Transparent"
+            label="Sell"
+            onPress={() => console.log('Sell pressed')}
+          />
         </View>
       </View>
 
@@ -186,32 +212,6 @@ export default function Explore() {
             width: '100%',
           }} />
         </View>
-
-
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-        gap: 10,
-      }}>
-        <View style={{ flex: 1 }}>
-          <ButtonStyle
-            type="Fill"
-            label="Buy"
-            onPress={() => console.log('Buy pressed')}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <ButtonStyle
-            type="Transparent"
-            label="Sell"
-            onPress={() => console.log('Sell pressed')}
-          />
-        </View>
-      </View>
     </View>
   );
 }
