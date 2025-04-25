@@ -1,10 +1,10 @@
 import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native';
-import BitcoinLogo from '@/assets/images/bitcoin_logo';
-import EthLogo from '@/assets/eth_icon';
+import BitcoinLogo from '@/assets/images/BitcoinLogo';
+import EthLogo from '@/assets/images/ETHLogo';
 import Settings from '@/assets/images/Settings';
-import GraphEth from '@/assets/images/Graph_eth';
-import GraphBtc from '@/assets/images/Graph_btc';
+import GraphEth from '@/assets/images/GraphETH';
+import GraphBtc from '@/assets/images/GraphBTC';
 import Group from '@/assets/images/Group';
 
 const windowWidth = Dimensions.get('window').width;

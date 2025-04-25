@@ -3,6 +3,7 @@ import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
 import { View, Text } from 'react-native';
 import ChartComponent from '@/components/ChartComponent';
+import BitcoinLogo from '@/assets/images/BitcoinLogo';
 
 export default function Explore() {
   return (
@@ -40,7 +41,9 @@ export default function Explore() {
           backgroundColor: '#212125',
           alignItems: 'center',
           justifyContent: 'center',
-        }} />
+        }}>
+          <BitcoinLogo />
+        </View>
         
         <View style={{ flex: 1, paddingLeft: 10 }}>
           <View style={{
