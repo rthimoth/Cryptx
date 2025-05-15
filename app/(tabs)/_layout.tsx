@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
 
@@ -8,8 +8,14 @@ import { Colors } from '@/constants/Colors';
 import Home from '@/assets/images/Home';
 import Details from '@/assets/images/Details';
 import Account from '@/assets/images/Account';
+import { useStorage } from '@/core/storage';
 
 export default function TabLayout() {
+  const [isOnboarded] = useStorage('is_onboarded')
+
+  if (isOnboarded === null) {
+    return <Redirect href={"/onboarding"} />
+  }
 
   return (
     <Tabs
