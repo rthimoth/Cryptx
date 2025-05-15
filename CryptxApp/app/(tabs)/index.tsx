@@ -1,32 +1,69 @@
-import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, ScrollView, SafeAreaView } from 'react-native';
 import { Text } from 'react-native';
 import BitcoinLogo from '@/assets/images/BitcoinLogo';
 import EthLogo from '@/assets/images/ETHLogo';
-import Settings from '@/assets/images/Settings';
 import GraphEth from '@/assets/images/GraphETH';
 import GraphBtc from '@/assets/images/GraphBTC';
-import Group from '@/assets/images/Group';
+import CryptoCard from '@/components/CryptoCard';
+import BalanceCard from '@/components/BalanceCard';
+import SectionHeader from '@/components/SectionHeader';
+import ProfileHeader from '@/components/ProfileHeader';
+import BackgroundGradient from '@/components/BackgroundGradient';
 import ButtonStyle from '@/components/ButtonStyle';
-
-const windowWidth = Dimensions.get('window').width;
+import { updateWalletPrices, getWallet } from '@/query/walletService';
 
 export default function HomeScreen() {
+  const [wallet, setWallet] = useState(getWallet());
+  const [loading, setLoading] = useState(true);
+
+  // Charger les données du portefeuille
+  useEffect(() => {
+    const loadWalletData = async () => {
+      try {
+        setLoading(true);
+        const updatedWallet = await updateWalletPrices();
+        setWallet(updatedWallet);
+      } catch (error) {
+        console.error('Erreur de chargement du portefeuille:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadWalletData();
+
+    // Rafraîchir les données toutes les 30 secondes
+    const interval = setInterval(() => {
+      loadWalletData();
+    }, 300000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Formater les montants en USD
+  const formatUSD = (amount: number) => {
+    return `$${amount.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+  };
+
+  // Déterminer si la variation est positive
+  const isPositiveChange = wallet.percentChange >= 0;
+
+  // Formater le pourcentage de variation
+  const formatPercentChange = (percent: number) => {
+    return `${Math.abs(percent).toFixed(2)}%`;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <View style={styles.space}>
-            <Image
-              source={require('@/assets/images/profil.png')}
-              style={styles.profil}
-              resizeMode="contain"
-            />
-            <Settings />
-          </View>
-          
-          <Group
-            style={styles.reactLogo}
+          <ProfileHeader 
+            onProfilePress={() => console.log('Profile pressed')}
+            onSettingsPress={() => console.log('Settings pressed')}
           />
+          
+          <BackgroundGradient height={360} />
           
           <View style={styles.mainContent}>
             <View style={styles.titleContainer}>
@@ -35,86 +72,64 @@ export default function HomeScreen() {
               </Text>
             </View>
             
-            <View style={styles.balanceCard}>
-              <Image 
-                source={require('@/assets/images/Rectangle.png')}
-                style={styles.balanceBackground}
-                resizeMode="cover"
-              />
-              <Text style={styles.balanceLabel}>Current Balance</Text>
-              <View style={styles.balanceRow}>
-                <Text style={styles.balanceAmount}>$87,430.12</Text>
-                <Text style={styles.balancePercent}>↑ 10.2%</Text>
-              </View>
-            </View>
+            <BalanceCard 
+              balance={loading ? "Chargement..." : formatUSD(wallet.totalValue)} 
+              percentChange={loading ? "0%" : formatPercentChange(wallet.percentChange)} 
+              isPositive={isPositiveChange}
+              animation="slideDown"
+            />
             
             <View style={styles.buttonContainer}>
               <View style={styles.buttonWrapper}>
-                <ButtonStyle type="Fill" label="Deposit" onPress={() => {}} />
+                <ButtonStyle type="Fill" label="Deposit" onPress={() => console.log('Deposit pressed')} />
               </View>
               <View style={styles.buttonWrapper}>
-                <ButtonStyle type="Transparent" label="Withdraw" onPress={() => {}} />
+                <ButtonStyle type="Transparent" label="Withdraw" onPress={() => console.log('Withdraw pressed')} />
               </View>
             </View>
           </View>
         </View>
         
-        <View style={styles.holding}>
-          <Text style={styles.holdingTitle}>
-            Holdings
-          </Text>
-          <Text style={styles.seeAllText}>
-            See All
-          </Text>
-        </View>
+        <SectionHeader 
+          title="Holdings"
+          actionText="See All"
+          onActionPress={() => console.log('See All pressed')}
+        />
+
         <View style={styles.cryptoList}>
-          <View style={styles.cryptoCard}>
-            <View style={styles.cryptoIconContainer}>
-              <EthLogo
-                width={24}
-                height={24}
-                style={styles.cryptoIcon}
+          {!loading && wallet.assets.map((asset, index) => {
+            // Définir quel logo de crypto utiliser
+            let IconComponent;
+            let GraphComponent;
+            
+            if (asset.symbol === 'BTC') {
+              IconComponent = BitcoinLogo;
+              GraphComponent = GraphBtc;
+            } else if (asset.symbol === 'ETH') {
+              IconComponent = EthLogo;
+              GraphComponent = GraphEth;
+            } else {
+              // Pour les autres, vous devriez ajouter des logos supplémentaires
+              IconComponent = asset.symbol === 'BNB' ? BitcoinLogo : EthLogo; // Temporaire
+              GraphComponent = asset.percentChange >= 0 ? GraphEth : GraphBtc; // Temporaire
+            }
+            
+            return (
+              <CryptoCard 
+                key={asset.symbol}
+                index={index}
+                name={asset.name}
+                symbol={asset.symbol}
+                price={formatUSD(asset.currentPrice || 0)}
+                quantity={`${asset.quantity} ${asset.symbol}`}
+                iconComponent={IconComponent}
+                graphComponent={GraphComponent}
+                graphStrokeColor={asset.percentChange >= 0 ? "#4CD964" : "#FF3B30"}
+                animationType={index % 2 === 0 ? "fadeLeft" : "fadeRight"}
+                animationDelay={150}
               />
-            </View>
-            <View style={styles.cryptoInfo}>
-              <Text style={styles.cryptoName}>Ethereum</Text>
-              <Text style={styles.cryptoSymbol}>ETH</Text>
-            </View>
-            <View style={styles.cryptoGraph}>
-              <GraphEth 
-                style={styles.graphLine}
-                stroke="#4CD964"
-              />
-            </View>
-            <View style={styles.cryptoValue}>
-              <Text style={styles.cryptoPrice}>$503.12</Text>
-              <Text style={styles.cryptoQuantity}>50 ETH</Text>
-            </View>
-          </View>
-          
-          <View style={styles.cryptoCard}>
-            <View style={styles.cryptoIconContainer}>
-              <BitcoinLogo
-                width={22}
-                height={22}
-                style={styles.cryptoIcon}
-              />
-            </View>
-            <View style={styles.cryptoInfo}>
-              <Text style={styles.cryptoName}>Bitcoin</Text>
-              <Text style={styles.cryptoSymbol}>BTC</Text>
-            </View>
-            <View style={styles.cryptoGraph}>
-              <GraphBtc
-                style={styles.graphLine}
-                stroke="#FF3B30"
-              />
-            </View>
-            <View style={styles.cryptoValue}>
-              <Text style={styles.cryptoPrice}>$26927</Text>
-              <Text style={styles.cryptoQuantity}>2.05 BTC</Text>
-            </View>
-          </View>
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -142,99 +157,16 @@ const styles = StyleSheet.create({
     paddingTop: 100,
     zIndex: 2,
   },
-  content: {
-    padding: 32,
-    backgroundColor: '#000000',
+  titleContainer: {
+    alignSelf: 'flex-start',
+    paddingLeft: 20,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 16,
-  },
-  holdingTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  text: {
-    fontSize: 16,
-    color: '#FFFFFF',
-  },
-  seeAllText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#FFFFFF',
-  },
-  reactLogo: {
-    width: windowWidth,
-    height: '100%',
-    position: 'absolute',
-    top: 0,
-    zIndex: 0,
-  },
-  profil: {
-    width: 48,
-    height: 48,
-  },
-  settings: {
-    width: 24,
-    height: 24,
-  },
-  space: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 20,
-    position: 'absolute',
-    top: 30,
-    zIndex: 3,
-  },
-  titleContainer: {
-    alignSelf: 'flex-start',
-    paddingLeft: 20,
-    marginBottom: 20,
-  },
-  balanceCard: {
-    width: '85%',
-    padding: 16,
-    borderRadius: 20,
-    position: 'relative',
-    marginBottom: 20,
-    zIndex: 2,
-    height: 100,
-    overflow: 'hidden',
-  },
-  balanceBackground: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-    borderRadius: 20,
-  },
-  balanceLabel: {
-    fontSize: 16,
-    color: '#070707',
-    marginBottom: 8,
-  },
-  balanceAmount: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#070707',
-  },
-  balanceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  balancePercent: {
-    marginRight: 35,
-    fontSize: 16,
-    color: '#8833ff',
-    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -246,68 +178,7 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     width: '48%',
   },
-  holding: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 15,
-  },
   cryptoList: {
     paddingHorizontal: 20,
-  },
-  cryptoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 15,
-    marginBottom: 15,
-  },
-  cryptoIconContainer: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#333333',
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  cryptoIcon: {
-    width: 24,
-    height: 24,
-  },
-  cryptoInfo: {
-    flex: 1,
-  },
-  cryptoName: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cryptoSymbol: {
-    color: '#8E8E93',
-    fontSize: 14,
-  },
-  cryptoGraph: {
-    width: 80,
-    height: 30,
-    marginHorizontal: 10,
-  },
-  graphLine: {
-    width: '100%',
-    height: '100%',
-  },
-  cryptoValue: {
-    alignItems: 'flex-end',
-  },
-  cryptoPrice: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cryptoQuantity: {
-    color: '#8E8E93',
-    fontSize: 12,
   },
 });
