@@ -19,7 +19,7 @@ interface Slide {
 const slides: Slide[] = [
   {
     id: '1',
-    title: 'Bienvenue sur Cript',
+    title: 'Bienvenue sur Crypt',
     subtitle: 'Commencez votre voyage crypto',
     description: 'Découvrez le monde passionnant des cryptomonnaies',
   },
@@ -31,7 +31,7 @@ const slides: Slide[] = [
   },
   {
     id: '3',
-    title: 'Cript',
+    title: 'Crypt',
     subtitle: 'Jump start your crypto portfolio',
     description: 'Take your investment portfolio to next level',
   },
@@ -94,7 +94,7 @@ export default function Onboarding() {
         <Text style={styles.title}>
           {index === 0 ? (
             <>
-              Bienvenue sur Cript<Text style={styles.highlight}>X</Text>
+              Bienvenue sur Crypt<Text style={styles.highlight}>X</Text>
             </>
           ) : index === 2 ? (
             <>
@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   title: {
+    width: '90%',
     fontSize: 60,
     fontWeight: 'bold',
     marginBottom: 40,
