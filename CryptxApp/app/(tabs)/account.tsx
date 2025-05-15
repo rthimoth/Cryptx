@@ -1,4 +1,5 @@
 import { useFetchProducts } from '@/query/use-fetch-data';
+import React from 'react';
 import { View, Text } from 'react-native';
 
 type Product = {

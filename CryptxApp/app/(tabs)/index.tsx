@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, View, ScrollView, SafeAreaView, Dimensions, TouchableOpacity, Button } from 'react-native';
 import { Text } from 'react-native';
 import BitcoinLogo from '@/assets/images/BitcoinLogo';
 import EthLogo from '@/assets/images/ETHLogo';
@@ -7,12 +7,22 @@ import GraphEth from '@/assets/images/GraphETH';
 import GraphBtc from '@/assets/images/GraphBTC';
 import Group from '@/assets/images/Group';
 import ButtonStyle from '@/components/ButtonStyle';
+import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const windowWidth = Dimensions.get('window').width;
 
 export default function HomeScreen() {
   return (
+    
     <SafeAreaView style={styles.container}>
+      <Button
+        title="Reset onboarding"
+        onPress={() => {
+          AsyncStorage.removeItem('hasOnboarded');
+          console.log('Reset done');
+        }}
+      />
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
           <View style={styles.space}>
