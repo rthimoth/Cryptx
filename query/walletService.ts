@@ -39,7 +39,7 @@ const mockWallet: WalletAsset[] = [
   {
     symbol: "BNB",
     fullSymbol: "BNBUSDT",
-    name: "Binance Coin",
+    name: "BNB",
     quantity: 30,
     initialPrice: 250
   },

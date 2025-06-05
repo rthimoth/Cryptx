@@ -49,26 +49,37 @@ const CryptoCard: React.FC<CryptoCardProps> = ({
       delay={animationDelay}
       animation={animationType}
     >
-      <View style={styles.cryptoIconContainer}>
-        <IconComponent
-          width={24}
-          height={24}
-          style={styles.cryptoIcon}
-        />
+      {/* Section gauche: logo et infos */}
+      <View style={styles.leftSection}>
+        <View style={styles.cryptoIconContainer}>
+          <IconComponent
+            width={18}
+            height={18}
+            style={styles.cryptoIcon}
+          />
+        </View>
+        <View style={styles.cryptoInfo}>
+          <Text style={styles.cryptoName} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
+          <Text style={styles.cryptoSymbol}>{symbol}</Text>
+        </View>
       </View>
-      <View style={styles.cryptoInfo}>
-        <Text style={styles.cryptoName}>{name}</Text>
-        <Text style={styles.cryptoSymbol}>{symbol}</Text>
+      
+      {/* Section centrale: graphique */}
+      <View style={styles.centerSection}>
+        <View style={styles.cryptoGraph}>
+          <GraphComponent 
+            style={styles.graphLine}
+            stroke={graphStrokeColor}
+          />
+        </View>
       </View>
-      <View style={styles.cryptoGraph}>
-        <GraphComponent 
-          style={styles.graphLine}
-          stroke={graphStrokeColor}
-        />
-      </View>
-      <View style={styles.cryptoValue}>
-        <Text style={styles.cryptoPrice}>{price}</Text>
-        <Text style={styles.cryptoQuantity}>{quantity}</Text>
+      
+      {/* Section droite: prix */}
+      <View style={styles.rightSection}>
+        <View style={styles.cryptoValue}>
+          <Text style={styles.cryptoPrice}>{price}</Text>
+          <Text style={styles.cryptoQuantity}>{quantity}</Text>
+        </View>
       </View>
     </AnimatedCard>
   );
@@ -80,38 +91,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#1C1C1E',
     borderRadius: 16,
-    padding: 15,
+    padding: 12,
     marginBottom: 15,
   },
+  leftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '35%',
+  },
+  centerSection: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '35%',
+  },
+  rightSection: {
+    alignItems: 'flex-end',
+    width: '30%',
+  },
   cryptoIconContainer: {
-    width: 40,
-    height: 40,
+    width: 34,
+    height: 34,
     backgroundColor: '#333333',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 10,
   },
   cryptoIcon: {
-    width: 24,
-    height: 24,
+    width: 18,
+    height: 18,
   },
   cryptoInfo: {
     flex: 1,
   },
   cryptoName: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   cryptoSymbol: {
     color: '#8E8E93',
-    fontSize: 14,
+    fontSize: 12,
   },
   cryptoGraph: {
-    width: 80,
-    height: 30,
-    marginHorizontal: 10,
+    width: 70,
+    height: 25,
+    alignSelf: 'center',
   },
   graphLine: {
     width: '100%',
@@ -122,12 +147,12 @@ const styles = StyleSheet.create({
   },
   cryptoPrice: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   cryptoQuantity: {
     color: '#8E8E93',
-    fontSize: 12,
+    fontSize: 11,
   },
 });
 

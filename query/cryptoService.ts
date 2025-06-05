@@ -76,23 +76,27 @@ export const getCryptoInfo = async (symbol: string) => {
     }
   };
 
-export const getCryptoHistoricalData = async (symbol: string): Promise<any[]> => {
+export const getCryptoHistoricalData = async (
+  symbol: string,
+  interval: string = '1d',
+  limit: number = 30
+): Promise<any[]> => {
     try {
         const res = await axios.get('https://api.binance.com/api/v3/klines', {
             params: {
                 symbol: symbol,
-                interval: '1d',
-                limit: 7,
+                interval: interval, // Intervalles disponibles: 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M
+                limit: limit, // Maximum 1000 points de données
             },
         });
 
         const data = res.data.map((item: any) => ({
             time: new Date(item[0]),
-            open: item[1],
-            high: item[2],
-            low: item[3],
-            close: item[4],
-            volume: item[5],
+            open: parseFloat(item[1]),
+            high: parseFloat(item[2]),
+            low: parseFloat(item[3]),
+            close: parseFloat(item[4]),
+            volume: parseFloat(item[5]),
         }));
 
         return data;
