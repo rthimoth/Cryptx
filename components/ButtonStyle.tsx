@@ -5,14 +5,15 @@ type ButtonStyleProps = {
   type: 'Fill' | 'Transparent';
   label?: string;
   onPress: () => void;
+  style?: object;
 };
 
-const ButtonStyle: React.FC<ButtonStyleProps> = ({ type, label, onPress }) => {
+const ButtonStyle: React.FC<ButtonStyleProps> = ({ type, label, onPress, style }) => {
   const isFill = type === 'Fill';
 
   return (
     <TouchableOpacity
-      style={[styles.button, isFill ? styles.selectedFill : styles.selectedTransparent]}
+      style={[styles.button, isFill ? styles.selectedFill : styles.selectedTransparent, style]}
       onPress={onPress}
     >
       <Text style={styles.selectedText}>{label || type}</Text>
