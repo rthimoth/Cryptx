@@ -57,6 +57,13 @@ const mockWallet: WalletAsset[] = [
     quantity: 1000,
     initialPrice: 0.5
   },
+  {
+    symbol: "DOGE",
+    fullSymbol: "DOGEUSDT",
+    name: "Dogecoin",
+    quantity: 1000,
+    initialPrice: 0.5
+  }
 ];
 
 // État global du portefeuille

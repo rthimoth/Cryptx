@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView, SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  FlatList, 
+  SafeAreaView, 
+  RefreshControl,
+  ListRenderItem 
+} from 'react-native';
 import { Text } from 'react-native';
 import BitcoinLogo from '@/assets/images/BitcoinLogo';
 import EthLogo from '@/assets/images/ETHLogo';
@@ -10,26 +17,41 @@ import ProfileHeader from '@/components/ProfileHeader';
 import BackgroundGradient from '@/components/BackgroundGradient';
 import ButtonStyle from '@/components/ButtonStyle';
 import LiveChart from '@/components/LiveChart';
-import { updateWalletPrices, getWallet } from '@/query/walletService';
+import SkeletonCard from '@/components/SkeletonCard';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
+import { updateWalletPrices, getWallet, Asset } from '@/query/walletService';
+
+// Types pour gérer les différents états
+type LoadingState = 'idle' | 'loading' | 'refreshing' | 'error';
 
 export default function HomeScreen() {
   const [wallet, setWallet] = useState(getWallet());
-  const [loading, setLoading] = useState(true);
+  const [loadingState, setLoadingState] = useState<LoadingState>('loading');
+  const [refreshing, setRefreshing] = useState(false);
 
   // Charger les données du portefeuille
-  useEffect(() => {
-    const loadWalletData = async () => {
-      try {
-        setLoading(true);
-        const updatedWallet = await updateWalletPrices();
-        setWallet(updatedWallet);
-      } catch (error) {
-        console.error('Erreur de chargement du portefeuille:', error);
-      } finally {
-        setLoading(false);
+  const loadWalletData = useCallback(async (isRefreshing = false) => {
+    try {
+      if (isRefreshing) {
+        setRefreshing(true);
+      } else {
+        setLoadingState('loading');
       }
-    };
+      
+      const updatedWallet = await updateWalletPrices();
+      setWallet(updatedWallet);
+      setLoadingState('idle');
+    } catch (error) {
+      console.error('Erreur de chargement du portefeuille:', error);
+      setLoadingState('error');
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
+  // Effet initial pour charger les données
+  useEffect(() => {
     loadWalletData();
 
     // Rafraîchir les données toutes les 8 minutes environ
@@ -38,7 +60,17 @@ export default function HomeScreen() {
     }, 500000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [loadWalletData]);
+
+  // Gérer le pull-to-refresh
+  const onRefresh = useCallback(() => {
+    loadWalletData(true);
+  }, [loadWalletData]);
+
+  // Gérer le retry en cas d'erreur
+  const onRetry = useCallback(() => {
+    loadWalletData();
+  }, [loadWalletData]);
 
   // Formater les montants en USD
   const formatUSD = (amount: number) => {
@@ -61,93 +93,208 @@ export default function HomeScreen() {
         stroke={isPositive ? "#4CD964" : "#FF3B30"}
         width={props.width || 80}
         height={props.height || 30}
-        timePeriod="7d"  // Afficher les données sur 90 jours
+        timePeriod="7d"
         strokeWidth={1.5}
         {...props}
       />
     );
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <ProfileHeader 
-            onProfilePress={() => console.log('Profile pressed')}
-            onSettingsPress={() => console.log('Settings pressed')}
-          />
-          
-          <BackgroundGradient height={360} />
-          
-          <View style={styles.mainContent}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.title}>
-                Hello Alex
-              </Text>
-            </View>
-            
-            <BalanceCard 
-              balance={loading ? "Chargement..." : formatUSD(wallet.totalValue)} 
-              percentChange={loading ? "0%" : formatPercentChange(wallet.percentChange)} 
-              isPositive={isPositiveChange}
-              animation="slideDown"
-            />
-            
-            <View style={styles.buttonContainer}>
-              <View style={styles.buttonWrapper}>
-                <ButtonStyle type="Fill" label="Deposit" onPress={() => console.log('Deposit pressed')} />
-              </View>
-              <View style={styles.buttonWrapper}>
-                <ButtonStyle type="Transparent" label="Withdraw" onPress={() => console.log('Withdraw pressed')} />
-              </View>
-            </View>
-          </View>
+  // Rendu d'un élément de la liste
+  const renderCryptoItem: ListRenderItem<Asset> = ({ item: asset, index }) => {
+    // Définir quel logo de crypto utiliser
+    let IconComponent;
+    
+    if (asset.symbol === 'BTC') {
+      IconComponent = BitcoinLogo;
+    } else if (asset.symbol === 'ETH') {
+      IconComponent = EthLogo;
+    } else {
+      // Pour les autres, vous devriez ajouter des logos supplémentaires
+      IconComponent = asset.symbol === 'BNB' ? BitcoinLogo : EthLogo; // Temporaire
+    }
+    
+    // Vérifier si percentChange est défini
+    const isPositive = asset.percentChange !== undefined ? asset.percentChange >= 0 : true;
+    
+    // Créer dynamiquement le composant de graphique
+    const GraphComponent = createLiveChartComponent(asset.fullSymbol, isPositive);
+    
+    return (
+      <CryptoCard 
+        index={index}
+        name={asset.name}
+        symbol={asset.symbol}
+        price={formatUSD(asset.currentPrice || 0)}
+        quantity={`${asset.quantity} ${asset.symbol}`}
+        iconComponent={IconComponent}
+        graphComponent={GraphComponent}
+        graphStrokeColor={isPositive ? "#4CD964" : "#FF3B30"}
+        animationType={index % 2 === 0 ? "fadeLeft" : "fadeRight"}
+        animationDelay={150}
+      />
+    );
+  };
+
+  // Rendu du skeleton pendant le chargement
+  const renderSkeletonItem = ({ index }: { index: number }) => (
+    <SkeletonCard index={index} />
+  );
+
+  // Données pour le skeleton (3 éléments)
+  const skeletonData = new Array(3).fill(null).map((_, index) => ({ id: index }));
+
+  // Composant Header de la FlatList
+  const ListHeaderComponent = () => (
+    <View style={styles.header}>
+      <ProfileHeader 
+        onProfilePress={() => console.log('Profile pressed')}
+        onSettingsPress={() => console.log('Settings pressed')}
+      />
+      
+      <BackgroundGradient height={360} />
+      
+      <View style={styles.mainContent}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>
+            Hello Alex
+          </Text>
         </View>
         
-        <SectionHeader 
-          title="Holdings"
-          actionText="See All"
-          onActionPress={() => console.log('See All pressed')}
+        <BalanceCard 
+          balance={loadingState === 'loading' ? "Chargement..." : formatUSD(wallet.totalValue)} 
+          percentChange={loadingState === 'loading' ? "0%" : formatPercentChange(wallet.percentChange)} 
+          isPositive={isPositiveChange}
+          animation="slideDown"
         />
-
-        <View style={styles.cryptoList}>
-          {!loading && wallet.assets.map((asset, index) => {
-            // Définir quel logo de crypto utiliser
-            let IconComponent;
-            
-            if (asset.symbol === 'BTC') {
-              IconComponent = BitcoinLogo;
-            } else if (asset.symbol === 'ETH') {
-              IconComponent = EthLogo;
-            } else {
-              // Pour les autres, vous devriez ajouter des logos supplémentaires
-              IconComponent = asset.symbol === 'BNB' ? BitcoinLogo : EthLogo; // Temporaire
-            }
-            
-            // Vérifier si percentChange est défini
-            const isPositive = asset.percentChange !== undefined ? asset.percentChange >= 0 : true;
-            
-            // Créer dynamiquement le composant de graphique
-            const GraphComponent = createLiveChartComponent(asset.fullSymbol, isPositive);
-            
-            return (
-              <CryptoCard 
-                key={asset.symbol}
-                index={index}
-                name={asset.name}
-                symbol={asset.symbol}
-                price={formatUSD(asset.currentPrice || 0)}
-                quantity={`${asset.quantity} ${asset.symbol}`}
-                iconComponent={IconComponent}
-                graphComponent={GraphComponent}
-                graphStrokeColor={isPositive ? "#4CD964" : "#FF3B30"}
-                animationType={index % 2 === 0 ? "fadeLeft" : "fadeRight"}
-                animationDelay={150}
-              />
-            );
-          })}
+        
+        <View style={styles.buttonContainer}>
+          <View style={styles.buttonWrapper}>
+            <ButtonStyle type="Fill" label="Deposit" onPress={() => console.log('Deposit pressed')} />
+          </View>
+          <View style={styles.buttonWrapper}>
+            <ButtonStyle type="Transparent" label="Withdraw" onPress={() => console.log('Withdraw pressed')} />
+          </View>
         </View>
-      </ScrollView>
+      </View>
+      
+      <SectionHeader 
+        title="Holdings"
+        actionText="See All"
+        onActionPress={() => console.log('See All pressed')}
+      />
+    </View>
+  );
+
+  // Gérer les différents états d'affichage
+  const renderContent = () => {
+    if (loadingState === 'error') {
+      return (
+        <FlatList
+          data={[]}
+          renderItem={() => null}
+          ListHeaderComponent={ListHeaderComponent}
+          ListFooterComponent={() => (
+            <ErrorState 
+              onRetry={onRetry}
+              title="Erreur de chargement"
+              subtitle="Impossible de charger les données du portefeuille"
+            />
+          )}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#FFFFFF"
+              titleColor="#FFFFFF"
+            />
+          }
+        />
+      );
+    }
+
+    if (loadingState === 'loading') {
+      return (
+        <FlatList
+          data={skeletonData}
+          renderItem={renderSkeletonItem}
+          keyExtractor={(item) => `skeleton-${item.id}`}
+          ListHeaderComponent={ListHeaderComponent}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#FFFFFF"
+              titleColor="#FFFFFF"
+            />
+          }
+        />
+      );
+    }
+
+    if (wallet.assets.length === 0) {
+      return (
+        <FlatList
+          data={[]}
+          renderItem={() => null}
+          ListHeaderComponent={ListHeaderComponent}
+          ListFooterComponent={() => (
+            <EmptyState 
+              title="Portefeuille vide"
+              subtitle="Commencez par ajouter des cryptomonnaies à votre portefeuille"
+            />
+          )}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#FFFFFF"
+              titleColor="#FFFFFF"
+            />
+          }
+        />
+      );
+    }
+
+    return (
+      <FlatList
+        data={wallet.assets}
+        renderItem={renderCryptoItem}
+        keyExtractor={(item) => item.symbol}
+        ListHeaderComponent={ListHeaderComponent}
+        contentContainerStyle={styles.flatListContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#FFFFFF"
+            titleColor="#FFFFFF"
+          />
+        }
+        // Optimisations de performance
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+        initialNumToRender={5}
+        getItemLayout={(data, index) => ({
+          length: 77, // hauteur approximative d'une CryptoCard (62px + 15px margin)
+          offset: 77 * index,
+          index,
+        })}
+      />
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {renderContent()}
     </SafeAreaView>
   );
 }
@@ -157,11 +304,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
-  scrollView: {
+  flatListContent: {
     backgroundColor: '#000000',
+    paddingBottom: 20,
   },
   header: {
-    height: 360,
     backgroundColor: '#000000',
     position: 'relative',
     width: '100%',
@@ -172,6 +319,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 100,
     zIndex: 2,
+    height: 360,
   },
   titleContainer: {
     alignSelf: 'flex-start',
@@ -193,8 +341,5 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: '48%',
-  },
-  cryptoList: {
-    paddingHorizontal: 20,
   },
 });

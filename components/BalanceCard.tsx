@@ -8,7 +8,7 @@ interface BalanceCardProps {
   isPositive?: boolean;
   backgroundImage?: any;
   label?: string;
-  animation?: 'fadeDown' | 'fadeUp' | 'fadeIn' | 'fadeLeft' | 'fadeRight' | 'slideDown' | 'slideUp' | 'slideLeft' | 'slideRight' | 'zoom';
+  // animation?: 'fadeDown' | 'fadeUp' | 'fadeIn' | 'fadeLeft' | 'fadeRight' | 'slideDown' | 'slideUp' | 'slideLeft' | 'slideRight' | 'zoom';
 }
 
 /**
@@ -27,13 +27,13 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
   isPositive = true,
   backgroundImage = require('@/assets/images/Rectangle.png'),
   label = "Current Balance",
-  animation = "fadeIn"
+  // animation = "fadeIn"
 }) => {
   return (
     <AnimatedCard
       index={0}
       style={styles.balanceCard}
-      animation={animation}
+      // animation={animation}
     >
       <Image 
         source={backgroundImage}
@@ -56,7 +56,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
 
 const styles = StyleSheet.create({
   balanceCard: {
-    width: '85%',
+    width: '90%',
     padding: 16,
     borderRadius: 20,
     position: 'relative',
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   balanceBackground: {
     position: 'absolute',
     width: '100%',
-    height: '100%',
+    height: '120%',
     top: 0,
     left: 0,
     borderRadius: 20,

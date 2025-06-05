@@ -20,6 +20,7 @@ const cryptoNameMap = {
     ADA: 'Cardano',
     DOT: 'Polkadot',
     BNB: 'BNB',
+    DOGE: 'Dogecoin',
 };
 
 export const fetchTickerPrice = async (symbol: string): Promise<TickerPrice> => {
