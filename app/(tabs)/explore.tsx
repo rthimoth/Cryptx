@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
@@ -7,9 +8,13 @@ import ChartComponent from '@/components/ChartComponent';
 import { getCryptoInfo, subscribeToPriceUpdates, getCryptoHistoricalData } from '../../query/cryptoService';
 
 export default function Explore() {
+  const params = useLocalSearchParams();
   const [currentPrice, setCurrentPrice] = useState<string>('0');
   const [cryptoInfo, setCryptoInfo] = useState<any>({});
-  const [selectedCoin, setSelectedCoin] = useState<string>('BTCUSDT');
+  
+  // Utiliser le paramètre passé ou BTC par défaut
+  const initialCrypto = params.crypto as string || 'BTC';
+  const [selectedCoin, setSelectedCoin] = useState<string>(`${initialCrypto}USDT`);
 
   useEffect(() => {
     const fetchCryptoInfo = async () => {
@@ -37,6 +42,13 @@ export default function Explore() {
     };
   }, [selectedCoin]);
 
+  // Mettre à jour selectedCoin si le paramètre change
+  useEffect(() => {
+    if (params.crypto && params.crypto !== selectedCoin.replace('USDT', '')) {
+      setSelectedCoin(`${params.crypto}USDT`);
+    }
+  }, [params.crypto]);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -47,6 +59,7 @@ export default function Explore() {
       <CryptoTabs 
         coins={['BTC', 'ETH', 'LTC', 'XRP', 'EOS', 'SOL', 'ADA', 'DOT', 'BNB']} 
         onSelectCoin={setSelectedCoin}
+        selectedCoin={selectedCoin.replace('USDT', '')}
       />
 
       <View style={styles.cryptoInfoContainer}>
@@ -71,7 +84,7 @@ export default function Explore() {
               {cryptoInfo.symbol || 'Loading...'}
             </Text>
             <Text style={styles.cryptoAmount}>
-              0 BTC
+              0 {selectedCoin.replace('USDT', '')}
             </Text>
           </View>
         </View>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 import AnimatedCard from './AnimatedCard';
 
@@ -14,6 +14,7 @@ interface CryptoCardProps {
   graphStrokeColor?: string;
   animationDelay?: number;
   animationType?: 'fadeDown' | 'fadeUp' | 'fadeIn' | 'fadeLeft' | 'fadeRight' | 'slideDown' | 'slideUp' | 'slideLeft' | 'slideRight' | 'zoom';
+  onPress?: () => void;
 }
 
 /**
@@ -29,6 +30,7 @@ interface CryptoCardProps {
  * @param props.graphStrokeColor - Couleur de la ligne du graphique
  * @param props.animationDelay - Délai entre les animations (ms)
  * @param props.animationType - Type d'animation à utiliser
+ * @param props.onPress - Fonction appelée lors du clic sur la carte
  */
 const CryptoCard: React.FC<CryptoCardProps> = ({
   index,
@@ -40,8 +42,11 @@ const CryptoCard: React.FC<CryptoCardProps> = ({
   graphComponent: GraphComponent,
   graphStrokeColor = "#4CD964",
   animationDelay = 250,
-  animationType = "fadeDown"
+  animationType = "fadeDown",
+  onPress
 }) => {
+  const CardWrapper = onPress ? TouchableOpacity : View;
+  
   return (
     <AnimatedCard
       index={index}
@@ -49,50 +54,58 @@ const CryptoCard: React.FC<CryptoCardProps> = ({
       delay={animationDelay}
       animation={animationType}
     >
-      {/* Section gauche: logo et infos */}
-      <View style={styles.leftSection}>
-        <View style={styles.cryptoIconContainer}>
-          <IconComponent
-            width={18}
-            height={18}
-            style={styles.cryptoIcon}
-          />
+      <CardWrapper
+        style={styles.cardContent}
+        onPress={onPress}
+        activeOpacity={onPress ? 0.7 : 1}
+      >
+        {/* Section gauche: logo et infos */}
+        <View style={styles.leftSection}>
+          <View style={styles.cryptoIconContainer}>
+            <IconComponent
+              width={18}
+              height={18}
+              style={styles.cryptoIcon}
+            />
+          </View>
+          <View style={styles.cryptoInfo}>
+            <Text style={styles.cryptoName} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
+            <Text style={styles.cryptoSymbol}>{symbol}</Text>
+          </View>
         </View>
-        <View style={styles.cryptoInfo}>
-          <Text style={styles.cryptoName} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
-          <Text style={styles.cryptoSymbol}>{symbol}</Text>
+        
+        {/* Section centrale: graphique */}
+        <View style={styles.centerSection}>
+          <View style={styles.cryptoGraph}>
+            <GraphComponent 
+              style={styles.graphLine}
+              stroke={graphStrokeColor}
+            />
+          </View>
         </View>
-      </View>
-      
-      {/* Section centrale: graphique */}
-      <View style={styles.centerSection}>
-        <View style={styles.cryptoGraph}>
-          <GraphComponent 
-            style={styles.graphLine}
-            stroke={graphStrokeColor}
-          />
+        
+        {/* Section droite: prix */}
+        <View style={styles.rightSection}>
+          <View style={styles.cryptoValue}>
+            <Text style={styles.cryptoPrice}>{price}</Text>
+            <Text style={styles.cryptoQuantity}>{quantity}</Text>
+          </View>
         </View>
-      </View>
-      
-      {/* Section droite: prix */}
-      <View style={styles.rightSection}>
-        <View style={styles.cryptoValue}>
-          <Text style={styles.cryptoPrice}>{price}</Text>
-          <Text style={styles.cryptoQuantity}>{quantity}</Text>
-        </View>
-      </View>
+      </CardWrapper>
     </AnimatedCard>
   );
 };
 
 const styles = StyleSheet.create({
   cryptoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#1C1C1E',
     borderRadius: 16,
-    padding: 12,
     marginBottom: 15,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
   },
   leftSection: {
     flexDirection: 'row',

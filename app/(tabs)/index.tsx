@@ -21,11 +21,13 @@ import SkeletonCard from '@/components/SkeletonCard';
 import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { updateWalletPrices, getWallet, Asset } from '@/query/walletService';
+import { useRouter } from 'expo-router';
 
 // Types pour gérer les différents états
 type LoadingState = 'idle' | 'loading' | 'refreshing' | 'error';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [wallet, setWallet] = useState(getWallet());
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const [refreshing, setRefreshing] = useState(false);
@@ -100,6 +102,24 @@ export default function HomeScreen() {
     );
   };
 
+  // Fonction pour naviguer vers explore avec la crypto sélectionnée
+  const navigateToExplore = useCallback((cryptoSymbol: string) => {
+    router.push({
+      pathname: '/explore',
+      params: { crypto: cryptoSymbol }
+    });
+  }, [router]);
+
+  // Fonction pour naviguer vers explore page générale
+  const navigateToExploreGeneral = useCallback(() => {
+    router.push('/explore');
+  }, [router]);
+
+  // Fonction pour naviguer vers account
+  const navigateToAccount = useCallback(() => {
+    router.push('/account');
+  }, [router]);
+
   // Rendu d'un élément de la liste
   const renderCryptoItem: ListRenderItem<Asset> = ({ item: asset, index }) => {
     // Définir quel logo de crypto utiliser
@@ -132,6 +152,7 @@ export default function HomeScreen() {
         graphStrokeColor={isPositive ? "#4CD964" : "#FF3B30"}
         animationType={index % 2 === 0 ? "fadeLeft" : "fadeRight"}
         animationDelay={150}
+        onPress={() => navigateToExplore(asset.symbol)}
       />
     );
   };
@@ -148,7 +169,7 @@ export default function HomeScreen() {
   const ListHeaderComponent = () => (
     <View style={styles.header}>
       <ProfileHeader 
-        onProfilePress={() => console.log('Profile pressed')}
+        onProfilePress={navigateToAccount}
         onSettingsPress={() => console.log('Settings pressed')}
       />
       
@@ -181,7 +202,7 @@ export default function HomeScreen() {
       <SectionHeader 
         title="Holdings"
         actionText="See All"
-        onActionPress={() => console.log('See All pressed')}
+        onActionPress={navigateToExploreGeneral}
       />
     </View>
   );
@@ -306,7 +327,7 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     backgroundColor: '#000000',
-    paddingBottom: 20,
+    paddingBottom: 50,
   },
   header: {
     backgroundColor: '#000000',
@@ -324,7 +345,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     alignSelf: 'flex-start',
     paddingLeft: 20,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,

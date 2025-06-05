@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 
 interface CryptoTabsProps {
   coins?: string[];
   onSelectCoin: (coin: string) => void;
+  selectedCoin?: string;
 }
 
-const CryptoTabs: React.FC<CryptoTabsProps> = ({ coins = ['BTC', 'ETH', 'LTC', 'XRP', 'EOS'], onSelectCoin }) => {
-  const [selected, setSelected] = useState(coins[0]);
+const CryptoTabs: React.FC<CryptoTabsProps> = ({ 
+  coins = ['BTC', 'ETH', 'LTC', 'XRP', 'EOS'], 
+  onSelectCoin,
+  selectedCoin 
+}) => {
+  const [selected, setSelected] = useState(selectedCoin || coins[0]);
 
-  const handleTabSelect = (coin: React.SetStateAction<string>) => {
+  // Mettre à jour selected quand selectedCoin change
+  useEffect(() => {
+    if (selectedCoin) {
+      setSelected(selectedCoin);
+    }
+  }, [selectedCoin]);
+
+  const handleTabSelect = (coin: string) => {
     setSelected(coin);
     onSelectCoin(coin + 'USDT');
   };
