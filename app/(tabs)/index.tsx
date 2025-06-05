@@ -186,7 +186,7 @@ export default function HomeScreen() {
           balance={loadingState === 'loading' ? "Chargement..." : formatUSD(wallet.totalValue)} 
           percentChange={loadingState === 'loading' ? "0%" : formatPercentChange(wallet.percentChange)} 
           isPositive={isPositiveChange}
-          animation="slideDown"
+          // animation="slideDown"
         />
         
         <View style={styles.buttonContainer}>
