@@ -10,6 +10,11 @@ import {
 import { Text } from 'react-native';
 import BitcoinLogo from '@/assets/images/BitcoinLogo';
 import EthLogo from '@/assets/images/ETHLogo';
+import XrpLogo from '@/assets/images/xrpusdt';
+import AdaLogo from '@/assets/images/ada';
+import DogeLogo from '@/assets/images/doge';
+import SolLogo from '@/assets/images/sol';
+import BnbLogo from '@/assets/images/bnb';
 import CryptoCard from '@/components/CryptoCard';
 import BalanceCard from '@/components/BalanceCard';
 import SectionHeader from '@/components/SectionHeader';
@@ -22,6 +27,7 @@ import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { updateWalletPrices, getWallet, Asset } from '@/query/walletService';
 import { useRouter } from 'expo-router';
+import { clearOnboarding } from '@/core/storage';
 
 // Types pour gérer les différents états
 type LoadingState = 'idle' | 'loading' | 'refreshing' | 'error';
@@ -31,6 +37,16 @@ export default function HomeScreen() {
   const [wallet, setWallet] = useState(getWallet());
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const [refreshing, setRefreshing] = useState(false);
+
+  const coinLogos: Record<string, any> = {
+    XRP: XrpLogo,
+    BTC: BitcoinLogo,
+    ETH: EthLogo,
+    ADA: AdaLogo,
+    DOGE: DogeLogo,
+    SOL: SolLogo,
+    BNB: BnbLogo,
+  }
 
   // Charger les données du portefeuille
   const loadWalletData = useCallback(async (isRefreshing = false) => {
