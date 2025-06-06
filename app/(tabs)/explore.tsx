@@ -5,7 +5,6 @@ import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
 import LiveChartDetails from '@/components/LiveChartDetails';
-import SkeletonCard from '@/components/SkeletonCard'; // Import your skeleton component
 import {
   getCryptoInfo,
   subscribeToPriceUpdates,
@@ -24,6 +23,18 @@ export default function Explore() {
 
   const initialCrypto = (params.crypto as string) || 'BTC';
   const [selectedCoin, setSelectedCoin] = useState<string>(`${initialCrypto}USDT`);
+
+  const coinLogos: Record<string, any> = {
+    BTC: require('@/assets/images/btcusdt.png'),
+    ETH: require('@/assets/images/ethusdt.png'),
+    LTC: require('@/assets/images/ltcusdt.png'),
+    XRP: require('@/assets/images/xrpusdt.png'),
+    EOS: require('@/assets/images/eosusdt.png'),
+    SOL: require('@/assets/images/solusdt.png'),
+    ADA: require('@/assets/images/adausdt.png'),
+    DOT: require('@/assets/images/dotusdt.png'),
+    BNB: require('@/assets/images/bnbusdt.png'),
+  }
 
   useEffect(() => {
     const fetchCryptoInfo = async () => {
@@ -92,8 +103,8 @@ export default function Explore() {
         <View style={styles.cryptoInfoContainer}>
           <View style={styles.logoContainer}>
             <Image
-              source={{ uri: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=040' }}
-              style={styles.logo}
+              source={coinLogos[selectedCoin.replace('USDT', '') as keyof typeof coinLogos]}
+            style={styles.logo}
             />
           </View>
 
