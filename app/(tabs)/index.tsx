@@ -163,7 +163,7 @@ export default function HomeScreen() {
   );
 
   // Données pour le skeleton (3 éléments)
-  const skeletonData = new Array(3).fill(null).map((_, index) => ({ id: index }));
+  const skeletonData = new Array(6).fill(null).map((_, index) => ({ id: index }));
 
   // Composant Header de la FlatList
   const ListHeaderComponent = () => (

@@ -1,72 +1,94 @@
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, Image, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 
 export default function Account() {
+  const opacity = useSharedValue(0);
+
+  // Style animé
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+
+  // Animation à chaque fois que la page reçoit le focus
+  useFocusEffect(
+    useCallback(() => {
+      opacity.value = 0;
+      opacity.value = withTiming(1, { duration: 400 });
+    }, [opacity])
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Account</Text>
-          <Settings />
-        </View>
+      <Animated.View style={[{ flex: 1 }, animatedStyle]}>
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Account</Text>
+            <Settings />
+          </View>
 
-        <View style={styles.profileSection}>
-          <Image
-            source={require('@/assets/images/profil.png')}
-            style={styles.profileImage}
-            resizeMode="cover"
-          />
-          <Text style={styles.profileName}>Alex Johnson</Text>
-          <Text style={styles.profileEmail}>alex.johnson@example.com</Text>
-        </View>
+          <View style={styles.profileSection}>
+            <Image
+              source={require('@/assets/images/profil.png')}
+              style={styles.profileImage}
+              resizeMode="cover"
+            />
+            <Text style={styles.profileName}>Alex Johnson</Text>
+            <Text style={styles.profileEmail}>alex.johnson@example.com</Text>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-          <TouchableOpacity style={styles.row}>
-            <Text style={styles.rowLabel}>Personal Info</Text>
-            <Text style={styles.rowValue}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.row}>
-            <Text style={styles.rowLabel}>Security</Text>
-            <Text style={styles.rowValue}>2FA Enabled</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.row}>
-            <Text style={styles.rowLabel}>Notifications</Text>
-            <Text style={styles.rowValue}>Push & Email</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Account Settings</Text>
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.rowLabel}>Personal Info</Text>
+              <Text style={styles.rowValue}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.rowLabel}>Security</Text>
+              <Text style={styles.rowValue}>2FA Enabled</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.rowLabel}>Notifications</Text>
+              <Text style={styles.rowValue}>Push & Email</Text>
+            </TouchableOpacity>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
-          <TouchableOpacity style={styles.row}>
-            <Text style={styles.rowLabel}>Language</Text>
-            <Text style={styles.rowValue}>English</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.row}>
-            <Text style={styles.rowLabel}>Theme</Text>
-            <Text style={styles.rowValue}>Dark</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preferences</Text>
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.rowLabel}>Language</Text>
+              <Text style={styles.rowValue}>English</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.rowLabel}>Theme</Text>
+              <Text style={styles.rowValue}>Dark</Text>
+            </TouchableOpacity>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Support</Text>
-          <TouchableOpacity style={styles.row}>
-            <Text style={styles.rowLabel}>Help Center</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.row}>
-            <Text style={styles.rowLabel}>Contact Us</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Support</Text>
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.rowLabel}>Help Center</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.row}>
+              <Text style={styles.rowLabel}>Contact Us</Text>
+            </TouchableOpacity>
+          </View>
 
-        <View style={styles.buttonWrapper}>
-          <ButtonStyle
-            type="Transparent"
-            label="Logout"
-            onPress={() => console.log('Logout pressed')}
-          />
-        </View>
-      </ScrollView>
+          <View style={styles.buttonWrapper}>
+            <ButtonStyle
+              type="Transparent"
+              label="Logout"
+              onPress={() => console.log('Logout pressed')}
+            />
+          </View>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

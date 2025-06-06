@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useFocusEffect } from 'expo-router';
+import Animated, { FadeIn, useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import { useCallback } from 'react';
 import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
@@ -11,10 +13,26 @@ export default function Explore() {
   const params = useLocalSearchParams();
   const [currentPrice, setCurrentPrice] = useState<string>('0');
   const [cryptoInfo, setCryptoInfo] = useState<any>({});
+  const opacity = useSharedValue(0);
   
   // Utiliser le paramètre passé ou BTC par défaut
   const initialCrypto = params.crypto as string || 'BTC';
   const [selectedCoin, setSelectedCoin] = useState<string>(`${initialCrypto}USDT`);
+
+  // Style animé
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+
+  // Animation à chaque fois que la page reçoit le focus
+  useFocusEffect(
+    useCallback(() => {
+      opacity.value = 0;
+      opacity.value = withTiming(1, { duration: 400 });
+    }, [opacity])
+  );
 
   useEffect(() => {
     const fetchCryptoInfo = async () => {
@@ -50,7 +68,7 @@ export default function Explore() {
   }, [params.crypto]);
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, animatedStyle]}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Trading</Text>
         <Settings />
@@ -112,7 +130,6 @@ export default function Explore() {
       <View style={styles.infoSection}>
         <Text style={styles.infoLabel}>At Price | USD</Text>
         <Text style={styles.infoValue}>0</Text>
-
         <View style={styles.separator} />
       </View>
 
@@ -129,10 +146,9 @@ export default function Explore() {
             <Text style={styles.percentage}>100%</Text>
           </View>
         </View>
-
         <View style={styles.separator} />
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
