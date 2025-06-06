@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import BitcoinLogo from '@/assets/images/BitcoinLogo';
+import EthLogo from '@/assets/images/ETHLogo';
+import XrpLogo from '@/assets/images/xrpusdt';
+import AdaLogo from '@/assets/images/ada';
+import DogeLogo from '@/assets/images/doge';
+import SolLogo from '@/assets/images/sol';
+import BnbLogo from '@/assets/images/bnb';
+import LtcLogo from '@/assets/images/ltc';
+import DotLogo from '@/assets/images/dot';
+import EosLogo from '@/assets/images/eos'
 import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
@@ -25,15 +35,16 @@ export default function Explore() {
   const [selectedCoin, setSelectedCoin] = useState<string>(`${initialCrypto}USDT`);
 
   const coinLogos: Record<string, any> = {
-    BTC: require('@/assets/images/btcusdt.png'),
-    ETH: require('@/assets/images/ethusdt.png'),
-    LTC: require('@/assets/images/ltcusdt.png'),
-    XRP: require('@/assets/images/xrpusdt.png'),
-    EOS: require('@/assets/images/eosusdt.png'),
-    SOL: require('@/assets/images/solusdt.png'),
-    ADA: require('@/assets/images/adausdt.png'),
-    DOT: require('@/assets/images/dotusdt.png'),
-    BNB: require('@/assets/images/bnbusdt.png'),
+    XRP: XrpLogo,
+    BTC: BitcoinLogo,
+    ETH: EthLogo,
+    ADA: AdaLogo,
+    DOGE: DogeLogo,
+    SOL: SolLogo,
+    BNB: BnbLogo,
+    LTC: LtcLogo,
+    DOT: DotLogo,
+    EOS: EosLogo
   }
 
   useEffect(() => {
@@ -102,10 +113,13 @@ export default function Explore() {
       ) : (
         <View style={styles.cryptoInfoContainer}>
           <View style={styles.logoContainer}>
-            <Image
-              source={coinLogos[selectedCoin.replace('USDT', '') as keyof typeof coinLogos]}
-            style={styles.logo}
-            />
+            {
+              (() => {
+                const Symbol = selectedCoin.replace('USDT', '');
+                const SvgIcon = coinLogos[Symbol] || coinLogos.BTC;
+                return SvgIcon ? <SvgIcon width={40} height={40} /> : null;
+              })()
+            } 
           </View>
 
           <View style={styles.cryptoDetails}>

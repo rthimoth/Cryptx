@@ -10,6 +10,11 @@ import {
 import { Text } from 'react-native';
 import BitcoinLogo from '@/assets/images/BitcoinLogo';
 import EthLogo from '@/assets/images/ETHLogo';
+import XrpLogo from '@/assets/images/xrpusdt';
+import AdaLogo from '@/assets/images/ada';
+import DogeLogo from '@/assets/images/doge';
+import SolLogo from '@/assets/images/sol';
+import BnbLogo from '@/assets/images/bnb';
 import CryptoCard from '@/components/CryptoCard';
 import BalanceCard from '@/components/BalanceCard';
 import SectionHeader from '@/components/SectionHeader';
@@ -32,6 +37,16 @@ export default function HomeScreen() {
   const [wallet, setWallet] = useState(getWallet());
   const [loadingState, setLoadingState] = useState<LoadingState>('loading');
   const [refreshing, setRefreshing] = useState(false);
+
+  const coinLogos: Record<string, any> = {
+    XRP: XrpLogo,
+    BTC: BitcoinLogo,
+    ETH: EthLogo,
+    ADA: AdaLogo,
+    DOGE: DogeLogo,
+    SOL: SolLogo,
+    BNB: BnbLogo,
+  }
 
   // Charger les données du portefeuille
   const loadWalletData = useCallback(async (isRefreshing = false) => {
@@ -124,16 +139,7 @@ export default function HomeScreen() {
   // Rendu d'un élément de la liste
   const renderCryptoItem: ListRenderItem<Asset> = ({ item: asset, index }) => {
     // Définir quel logo de crypto utiliser
-    let IconComponent;
-    
-    if (asset.symbol === 'BTC') {
-      IconComponent = BitcoinLogo;
-    } else if (asset.symbol === 'ETH') {
-      IconComponent = EthLogo;
-    } else {
-      // Pour les autres, vous devriez ajouter des logos supplémentaires
-      IconComponent = asset.symbol === 'BNB' ? BitcoinLogo : EthLogo; // Temporaire
-    }
+    const IconComponent = coinLogos[asset.symbol as keyof typeof coinLogos] || coinLogos.BTC;
     
     // Vérifier si percentChange est défini
     const isPositive = asset.percentChange !== undefined ? asset.percentChange >= 0 : true;
