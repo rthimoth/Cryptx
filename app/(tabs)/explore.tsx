@@ -1,39 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import Settings from '@/assets/images/Settings';
 import ButtonStyle from '@/components/ButtonStyle';
 import CryptoTabs from '@/components/CryptoTabs';
-import ChartComponent from '@/components/ChartComponent';
-import { getCryptoInfo, subscribeToPriceUpdates, getCryptoHistoricalData } from '../../query/cryptoService';
+import LiveChartDetails from '@/components/LiveChartDetails';
+import SkeletonCard from '@/components/SkeletonCard'; // Import your skeleton component
+import {
+  getCryptoInfo,
+  subscribeToPriceUpdates,
+  getCryptoHistoricalData,
+} from '../../query/cryptoService';
+import AdaptiveSkeletonCard from '@/components/AdaptiveSkeletonCard';
+
+const screenWidth = Dimensions.get('window').width;
+const chartWidth = Math.min(screenWidth * 0.9, 350);
 
 export default function Explore() {
   const params = useLocalSearchParams();
   const [currentPrice, setCurrentPrice] = useState<string>('0');
   const [cryptoInfo, setCryptoInfo] = useState<any>({});
-  
-  // Utiliser le paramètre passé ou BTC par défaut
-  const initialCrypto = params.crypto as string || 'BTC';
+  const [loading, setLoading] = useState(true);
+
+  const initialCrypto = (params.crypto as string) || 'BTC';
   const [selectedCoin, setSelectedCoin] = useState<string>(`${initialCrypto}USDT`);
 
   useEffect(() => {
     const fetchCryptoInfo = async () => {
       try {
+        setLoading(true);
         const info = await getCryptoInfo(selectedCoin);
         setCryptoInfo(info);
+        setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des infos de crypto', error);
+        setLoading(false);
       }
     };
 
     getCryptoHistoricalData(selectedCoin).then((data) => {
       console.log('Historical data:', data[0]);
     });
+
     fetchCryptoInfo();
   }, [selectedCoin]);
 
   useEffect(() => {
-    const ws = subscribeToPriceUpdates(selectedCoin.toLocaleLowerCase(), (price) => {
+    const ws = subscribeToPriceUpdates(selectedCoin.toLowerCase(), (price) => {
       setCurrentPrice(price);
     });
 
@@ -42,7 +55,6 @@ export default function Explore() {
     };
   }, [selectedCoin]);
 
-  // Mettre à jour selectedCoin si le paramètre change
   useEffect(() => {
     if (params.crypto && params.crypto !== selectedCoin.replace('USDT', '')) {
       setSelectedCoin(`${params.crypto}USDT`);
@@ -56,41 +68,79 @@ export default function Explore() {
         <Settings />
       </View>
 
-      <CryptoTabs 
-        coins={['BTC', 'ETH', 'LTC', 'XRP', 'EOS', 'SOL', 'ADA', 'DOT', 'BNB']} 
+      <CryptoTabs
+        coins={['BTC', 'ETH', 'LTC', 'XRP', 'EOS', 'SOL', 'ADA', 'DOT', 'BNB']}
         onSelectCoin={setSelectedCoin}
         selectedCoin={selectedCoin.replace('USDT', '')}
       />
 
-      <View style={styles.cryptoInfoContainer}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={{ uri: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=040' }}
-            style={styles.logo}
+      {loading ? (
+        <AdaptiveSkeletonCard
+          height={60}
+          padding={0}
+          borderRadius={6}
+          leftSection
+          centerSection={false}
+          rightSection
+          style={{
+            margin: 15,
+            paddingHorizontal: 20,
+            width: '90%',
+          }}
+        />
+      ) : (
+        <View style={styles.cryptoInfoContainer}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={{ uri: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=040' }}
+              style={styles.logo}
+            />
+          </View>
+
+          <View style={styles.cryptoDetails}>
+            <View style={styles.row}>
+              <Text style={styles.cryptoName}>
+                {cryptoInfo.name || 'Loading...'}
+              </Text>
+              <Text style={styles.cryptoPrice}>
+                ${parseFloat(currentPrice).toFixed(2)}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.cryptoSymbol}>
+                {cryptoInfo.symbol || 'Loading...'}
+              </Text>
+              <Text style={styles.cryptoAmount}>
+                0 {selectedCoin.replace('USDT', '')}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {loading ? (
+        <AdaptiveSkeletonCard
+          height={185}
+          padding={16}
+          borderRadius={12}
+          leftSection={false}
+          centerSection={false}
+          rightSection={false}
+          style={{ width: '90%' }} 
+        />
+      ) : (
+        <View style={{ width: chartWidth, alignSelf: 'flex-start', height: 200 }}>
+          <LiveChartDetails
+            symbol={selectedCoin}
+            width={chartWidth}
+            height={200}
+            stroke="#4CD964"
+            strokeWidth={2}
+            timePeriod="7d"
           />
         </View>
+      )}
 
-        <View style={styles.cryptoDetails}>
-          <View style={styles.row}>
-            <Text style={styles.cryptoName}>
-              {cryptoInfo.name || 'Loading...'}
-            </Text>
-            <Text style={styles.cryptoPrice}>
-              ${parseFloat(currentPrice).toFixed(2)}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cryptoSymbol}>
-              {cryptoInfo.symbol || 'Loading...'}
-            </Text>
-            <Text style={styles.cryptoAmount}>
-              0 {selectedCoin.replace('USDT', '')}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      <ChartComponent />
 
       <View style={styles.buttonContainer}>
         <View style={styles.buttonWrapper}>
@@ -112,7 +162,6 @@ export default function Explore() {
       <View style={styles.infoSection}>
         <Text style={styles.infoLabel}>At Price | USD</Text>
         <Text style={styles.infoValue}>0</Text>
-
         <View style={styles.separator} />
       </View>
 
@@ -129,7 +178,6 @@ export default function Explore() {
             <Text style={styles.percentage}>100%</Text>
           </View>
         </View>
-
         <View style={styles.separator} />
       </View>
     </View>
@@ -211,10 +259,12 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingHorizontal: 20,
+    marginTop: 40,
     gap: 10,
   },
   buttonWrapper: {
     flex: 1,
+    marginTop: 20,
   },
   infoSection: {
     alignItems: 'flex-start',
@@ -240,7 +290,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: '100%',
     marginBottom: 10,
-
   },
   amountWrapper: {
     alignItems: 'flex-start',

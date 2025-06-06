@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#070707',
     marginBottom: 8,
+    marginTop: 10,
   },
   balanceAmount: {
     fontSize: 28,
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 30,
   },
   balancePercent: {
     marginRight: 35,

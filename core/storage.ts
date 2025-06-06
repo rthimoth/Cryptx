@@ -20,3 +20,12 @@ export const useStorage = (key: string) => {
 
     return [value, setItem] as const
 }
+
+export const clearOnboarding = async () => {
+  try {
+    await AsyncStorage.removeItem('is_onboarded');
+    console.log('Onboarding flag cleared!');
+  } catch (e) {
+    console.error('Failed to clear onboarding flag:', e);
+  }
+};

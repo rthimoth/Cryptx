@@ -22,6 +22,7 @@ import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { updateWalletPrices, getWallet, Asset } from '@/query/walletService';
 import { useRouter } from 'expo-router';
+import { clearOnboarding } from '@/core/storage';
 
 // Types pour gérer les différents états
 type LoadingState = 'idle' | 'loading' | 'refreshing' | 'error';
@@ -170,7 +171,7 @@ export default function HomeScreen() {
     <View style={styles.header}>
       <ProfileHeader 
         onProfilePress={navigateToAccount}
-        onSettingsPress={() => console.log('Settings pressed')}
+        onSettingsPress={() => clearOnboarding()}
       />
       
       <BackgroundGradient height={360} />
@@ -186,7 +187,7 @@ export default function HomeScreen() {
           balance={loadingState === 'loading' ? "Chargement..." : formatUSD(wallet.totalValue)} 
           percentChange={loadingState === 'loading' ? "0%" : formatPercentChange(wallet.percentChange)} 
           isPositive={isPositiveChange}
-          animation="slideDown"
+          // animation="slideDown"
         />
         
         <View style={styles.buttonContainer}>

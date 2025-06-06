@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
   selectedText: {
     color: '#fff',
     fontWeight: '500',
+    fontSize: 18,
   },
 });
 
