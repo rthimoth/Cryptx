@@ -19,15 +19,15 @@ interface Slide {
 const slides: Slide[] = [
   {
     id: '1',
-    title: 'Bienvenue sur Crypt',
-    subtitle: 'Commencez votre voyage crypto',
-    description: 'Découvrez le monde passionnant des cryptomonnaies',
+    title: 'Welcome to Crypt',
+    subtitle: 'Start your crypto journey',
+    description: 'Discover the exciting world of cryptocurrencies',
   },
   {
     id: '2',
-    title: 'Trading Simplifié',
-    subtitle: 'Achetez et vendez facilement',
-    description: 'Une interface intuitive pour vos transactions',
+    title: 'Simplified Trading',
+    subtitle: 'Buy and sell with ease',
+    description: 'An intuitive interface for your transactions',
   },
   {
     id: '3',
